@@ -10,11 +10,21 @@ import {
 
 const CameraScreen = () => {
   
-  const device = useCameraDevice('back');
+  let device = useCameraDevice('back');
+ 
   const [scannedCodes, setScannedCodes] = useState([]);
   const [isScanningAllowed, setScanningAllowed] = useState(true); // State to control scanning
   const { hasPermission, requestPermission } = useCameraPermission();
   const[isgranted, setIsGranted]= useState(false)
+
+  useEffect(() => {
+    if (!hasPermission) {
+      requestPermission();
+    }else{
+      setIsGranted(true);
+    }
+  },[hasPermission]);  
+
 
   console.log(hasPermission);
  
@@ -34,18 +44,11 @@ const CameraScreen = () => {
     return <Text>Camera is not found!</Text>;
   }
 
-
-  useEffect(() => {
-    if (!hasPermission) {
-      requestPermission();
-    }
-    setIsGranted(true);
-  },[hasPermission]);  
-
+  
 
   return (
-    <View style={ styles.box}> 
-      {isgranted && (<Camera style={StyleSheet.absoluteFill} device={device} codeScanner={codeScanner} isActive={true} />)}     
+    <View style={ styles.box}>
+      {hasPermission && isgranted  &&  (<Camera style={StyleSheet.absoluteFill} device={device} codeScanner={codeScanner} isActive={true} />)}     
       {scannedCodes.length > 0 && (
         <View style={styles.overlay}>
           <Text>Scanned Codes:</Text>
